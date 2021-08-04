@@ -1,16 +1,7 @@
 import yaml
 import pprint
-from parser import puml_builder as pb
-
-yaml_path = [
-    "./tests/2.ServiceTracker_App/KubeVelaManifest/app.yaml",
-    "./tests/2.ServiceTracker_App/KubeVelaManifest/enhanced-webservice.yaml",
-]
-
-# yaml_path = [
-#     "./tests/3.BikeSharing360_MultiContainer_App/KubeVelaManifest/app.yaml",
-#     "./tests/3.BikeSharing360_MultiContainer_App/KubeVelaManifest/enhanced-webservice.yaml",
-# ]
+from uml_builder import puml_builder as pb
+from uml_builder import test as t
 
 apps = []
 components = {}
@@ -23,8 +14,7 @@ component_workload = {}
 
 
 # This function returns oam-yaml file as dict type data
-def read_yaml():
-    global yaml_path
+def read_yaml(yaml_path):
     yaml_list = []
 
     for path in yaml_path:
@@ -35,13 +25,11 @@ def read_yaml():
 
 
 def parse_yaml(yaml_list):
-    global apps, components, traits, workloads, app_component, component_trait, component_workload
-
     for yaml in yaml_list:
 
         # CASE: Application YAML
         if yaml["kind"] == "Application":
-            app_name = yaml["metadata"]["name"].replace("-", "_")
+            app_name = yaml["metadata"]["name"].replace("-", "_").title()
 
             if app_name not in apps:
                 apps.append(app_name)
@@ -51,7 +39,7 @@ def parse_yaml(yaml_list):
 
             for component in yaml["spec"]["components"]:
                 component_name = component["name"].replace("-", "_")
-                component_type = component["type"].replace("-", "_")
+                component_type = component["type"].replace("-", "_").title()
 
                 if component_type not in components:
                     components[component_type] = []
@@ -65,7 +53,7 @@ def parse_yaml(yaml_list):
 
                 if "traits" in component:
                     for trait in component["traits"]:
-                        trait_type = trait["type"].replace("-", "_")
+                        trait_type = trait["type"].replace("-", "_").title()
 
                         if trait_type not in traits:
                             traits.append(trait_type)
@@ -75,14 +63,14 @@ def parse_yaml(yaml_list):
 
         # CASE: Component YAML
         elif yaml["kind"] == "ComponentDefinition":
-            component_type = yaml["metadata"]["name"].replace("-", "_")
+            component_type = yaml["metadata"]["name"].replace("-", "_").title()
 
             if component_type not in component_workload:
                 component_workload[component_type] = []
 
             if "workload" in yaml["spec"]:
                 for workload in yaml["spec"]["workload"].values():
-                    workload_name = workload["kind"].replace("-", "_")
+                    workload_name = workload["kind"].replace("-", "_").title()
 
                     if workload_name not in workloads:
                         workloads.append(workload_name)
@@ -96,8 +84,6 @@ def parse_yaml(yaml_list):
 
 
 def print_data():
-    global apps, components, traits, workloads, app_component, component_trait, component_workload
-
     pp = pprint.PrettyPrinter(width=20, indent=4)
 
     pp.pprint("Apps")
@@ -122,21 +108,24 @@ def print_data():
     pp.pprint(component_workload)
 
 
-def build_uml():
-    f = open("./puml_output/yaml_data.uml", "w")
+def build_uml(idx):
+    f = open("./result/yaml_data.uml" + str(idx), "w")
     content = pb.header_builder()
     content += pb.package_builder("Applications", apps)
     content += pb.package_builder("Components", components)
     content += pb.package_builder("Traits", traits)
     content += pb.package_builder("Workloads", workloads)
-    content += pb.relation_builder(app_component, component_trait, component_workload)
+    content += pb.relation_builder(app_component, True)
+    content += pb.relation_builder(component_trait, False)
+    content += pb.relation_builder(component_workload, False)
     content += pb.footer_builder()
     f.write(content)
     f.close()
 
 
 if __name__ == "__main__":
-    yaml_list = read_yaml()
+    yaml_path = t.get_test_file_path(7)
+    yaml_list = read_yaml(yaml_path)
     parse_yaml(yaml_list)
     print_data()
-    build_uml()
+    build_uml("")

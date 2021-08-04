@@ -1,0 +1,84 @@
+@startuml OAM Visualization
+
+package Applications <<Rectangle>> {
+
+	class Boutique
+	class Product
+
+}
+
+package Components <<Rectangle>> {
+
+	class Microservice {
+		frontend
+		--
+		cartservice
+		--
+		currencyservice
+		--
+		paymentservice
+		--
+		shippingservice
+		--
+		emailservice
+		--
+		checkoutservice
+		--
+		recommendationservice
+		--
+		adservice
+		--
+		redis_cart
+	}
+
+	class Enhanced_Worker {
+		loadgenerator
+	}
+
+	class Enhanced_Webservice {
+		productcatalogservice
+	}
+
+}
+
+package Traits <<Rectangle>> {
+
+	class Patch_Annotations
+	class Patch_Http_Probe
+	class Patch_Resources_Limits
+	class Patch_Loadbalancer
+	class Patch_Cmd_Probe
+	class Patch_Tcp_Probe
+	class Patch_Volume
+
+}
+
+package Workloads <<Rectangle>> {
+
+	class Deployment
+
+}
+
+Microservice-up[dashed]-> Boutique
+Enhanced_Worker-up[dashed]-> Boutique
+Enhanced_Webservice-up[dashed]-> Product
+
+Patch_Annotations -up[dashed]- Microservice
+Patch_Http_Probe -up[dashed]- Microservice
+Patch_Resources_Limits -up[dashed]- Microservice
+Patch_Loadbalancer -up[dashed]- Microservice
+Patch_Cmd_Probe -up[dashed]- Microservice
+Patch_Tcp_Probe -up[dashed]- Microservice
+Patch_Volume -up[dashed]- Microservice
+Patch_Resources_Limits -up[dashed]- Enhanced_Worker
+Patch_Cmd_Probe -up[dashed]- Enhanced_Webservice
+Patch_Resources_Limits -up[dashed]- Enhanced_Webservice
+
+Deployment -up[dashed]- Enhanced_Webservice
+Deployment -up[dashed]- Enhanced_Worker
+Deployment -up[dashed]- Microservice
+
+hide methods
+hide circle
+
+@enduml
