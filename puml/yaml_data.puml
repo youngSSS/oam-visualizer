@@ -1,1 +1,0 @@
-{"name": "service-tracker", "components": {"service-tracker-ui": {}, "weather-api": {}, "quakes-api": {}, "flight-api": {}, "tracker-postgres-db": {}, "data-api": {}}}

@@ -1,0 +1,53 @@
+@startuml OAM Visualization
+
+package Applications <<Rectangle>> {
+
+	class service_tracker
+
+}
+
+package Components <<Rectangle>> {
+
+	class webservice {
+		service_tracker_ui
+	}
+
+	class enhanced_webservice {
+		weather_api
+		--
+		quakes_api
+		--
+		flight_api
+		--
+		tracker_postgres_db
+		--
+		data_api
+	}
+
+}
+
+package Traits <<Rectangle>> {
+
+	class ingress
+	class scaler
+
+}
+
+package Workloads <<Rectangle>> {
+
+	class Deployment
+
+}
+
+webservice -up[dashed]-> service_tracker
+enhanced_webservice -up[dashed]-> service_tracker
+
+ingress -up[dashed]- webservice
+scaler -up[dashed]- enhanced_webservice
+
+Deployment -up[dashed]- enhanced_webservice
+
+hide methods
+hide circle
+
+@enduml

@@ -1,5 +1,6 @@
 import yaml
 import pprint
+from parser import puml_builder as pb
 
 yaml_path = [
     "./tests/2.ServiceTracker_App/KubeVelaManifest/app.yaml",
@@ -40,7 +41,7 @@ def parse_yaml(yaml_list):
 
         # CASE: Application YAML
         if yaml["kind"] == "Application":
-            app_name = yaml["metadata"]["name"]
+            app_name = yaml["metadata"]["name"].replace("-", "_")
 
             if app_name not in apps:
                 apps.append(app_name)
@@ -49,8 +50,8 @@ def parse_yaml(yaml_list):
                     app_component[app_name] = []
 
             for component in yaml["spec"]["components"]:
-                component_name = component["name"]
-                component_type = component["type"]
+                component_name = component["name"].replace("-", "_")
+                component_type = component["type"].replace("-", "_")
 
                 if component_type not in components:
                     components[component_type] = []
@@ -59,12 +60,12 @@ def parse_yaml(yaml_list):
                 if component_name not in components[component_type]:
                     components[component_type].append(component_name)
 
-                if component_name not in app_component[app_name]:
-                    app_component[app_name].append(component_name)
+                if component_type not in app_component[app_name]:
+                    app_component[app_name].append(component_type)
 
                 if "traits" in component:
                     for trait in component["traits"]:
-                        trait_type = trait["type"]
+                        trait_type = trait["type"].replace("-", "_")
 
                         if trait_type not in traits:
                             traits.append(trait_type)
@@ -74,14 +75,14 @@ def parse_yaml(yaml_list):
 
         # CASE: Component YAML
         elif yaml["kind"] == "ComponentDefinition":
-            component_type = yaml["metadata"]["name"]
+            component_type = yaml["metadata"]["name"].replace("-", "_")
 
             if component_type not in component_workload:
                 component_workload[component_type] = []
 
             if "workload" in yaml["spec"]:
                 for workload in yaml["spec"]["workload"].values():
-                    workload_name = workload["kind"]
+                    workload_name = workload["kind"].replace("-", "_")
 
                     if workload_name not in workloads:
                         workloads.append(workload_name)
@@ -121,7 +122,21 @@ def print_data():
     pp.pprint(component_workload)
 
 
+def build_uml():
+    f = open("./puml_output/yaml_data.uml", "w")
+    content = pb.header_builder()
+    content += pb.package_builder("Applications", apps)
+    content += pb.package_builder("Components", components)
+    content += pb.package_builder("Traits", traits)
+    content += pb.package_builder("Workloads", workloads)
+    content += pb.relation_builder(app_component, component_trait, component_workload)
+    content += pb.footer_builder()
+    f.write(content)
+    f.close()
+
+
 if __name__ == "__main__":
     yaml_list = read_yaml()
     parse_yaml(yaml_list)
     print_data()
+    build_uml()
