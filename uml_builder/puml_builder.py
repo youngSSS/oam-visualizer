@@ -1,5 +1,5 @@
 def header_builder():
-    return "@startuml OAM Visualization\n\n"
+    return "@startuml OAM\n\n"
 
 
 def footer_builder():

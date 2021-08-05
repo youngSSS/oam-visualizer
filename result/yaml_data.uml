@@ -1,4 +1,4 @@
-@startuml OAM Visualization
+@startuml OAM
 
 package Applications <<Rectangle>> {
 
