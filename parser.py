@@ -3,6 +3,8 @@ import pprint
 from uml_builder import puml_builder as pb
 from uml_builder import test as t
 
+verbose = True
+
 apps = []
 components = {}
 traits = []
@@ -80,7 +82,8 @@ def parse_yaml(yaml_list):
 
         # CASE: Exception
         else:
-            print("================ Undefined Type: " + yaml["kind"] + " ================")
+            if verbose:
+                print("================ Undefined Type: " + yaml["kind"] + " ================")
 
 
 def print_data():
@@ -108,8 +111,8 @@ def print_data():
     pp.pprint(component_workload)
 
 
-def build_uml(idx):
-    f = open("./result/yaml_data.uml" + str(idx), "w")
+def build_uml():
+    f = open("./result/yaml_data.uml", "w")
     content = pb.header_builder()
     content += pb.package_builder("Applications", apps)
     content += pb.package_builder("Components", components)
@@ -127,5 +130,7 @@ if __name__ == "__main__":
     yaml_path = t.get_test_file_path(7)
     yaml_list = read_yaml(yaml_path)
     parse_yaml(yaml_list)
-    print_data()
-    build_uml("")
+    build_uml()
+
+    if verbose:
+        print_data()
