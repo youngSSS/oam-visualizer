@@ -80,7 +80,7 @@ def parse_yaml(yaml_list):
 
         # CASE: Exception
         else:
-            print("================== New Type: " + yaml["kind"] + " ==================")
+            print("================ Undefined Type: " + yaml["kind"] + " ================")
 
 
 def print_data():
