@@ -3,7 +3,7 @@ import pprint
 from uml_builder import puml_builder as pb
 from uml_builder import test as t
 
-verbose = True
+verbose = False
 
 apps = []
 components = {}
