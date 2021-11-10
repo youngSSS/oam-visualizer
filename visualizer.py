@@ -48,7 +48,10 @@ def update_app_data():
     # Case: Changes
     PARSED_APP_DATA_LOCK.acquire()
 
+    # Initialize global variables
     APP_DATA = app_data
+    PARSED_APP_DATA.clear()
+
     app_data = APP_DATA.split("\n")
     app_name = ""
 
@@ -76,9 +79,8 @@ def update_app_data():
 
         PARSED_APP_DATA[app_name].append(temp)
 
-    print("Changes in the application have been detected")
+    print("\nChanges in the application have been detected")
     print(APP_DATA)
-    print("> ")
 
     PARSED_APP_DATA_LOCK.release()
 

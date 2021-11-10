@@ -1,8 +1,8 @@
 @startuml visualized_application
 
-package First-App <<Rectangle>> {
+package Bikesharing <<Rectangle>> {
 
-	class HELLOWORLD {
+	class BIKESHARING-UI {
 		Type - webservice
 		--
 		Traits - ingress
@@ -13,7 +13,49 @@ package First-App <<Rectangle>> {
 		--
 		Status - 
 		--
-		Created_Time - 2021-11-09 20:33:00 +0900 KST
+		Created_Time - 2021-11-10 14:35:25 +0900 KST
+	}
+
+	class BIKESHARING-EMAIL-API {
+		Type - enhanced-webservice
+		--
+		Traits - 
+		--
+		Phase - running
+		--
+		Healthy - healthy
+		--
+		Status - 
+		--
+		Created_Time - 2021-11-10 14:35:25 +0900 KST
+	}
+
+	class BIKESHARING-PROFILE-API {
+		Type - enhanced-webservice
+		--
+		Traits - 
+		--
+		Phase - running
+		--
+		Healthy - healthy
+		--
+		Status - 
+		--
+		Created_Time - 2021-11-10 14:35:25 +0900 KST
+	}
+
+	class BIKESHARING-FEEDBACK-API {
+		Type - enhanced-webservice
+		--
+		Traits - 
+		--
+		Phase - running
+		--
+		Healthy - healthy
+		--
+		Status - 
+		--
+		Created_Time - 2021-11-10 14:35:25 +0900 KST
 	}
 
 }
