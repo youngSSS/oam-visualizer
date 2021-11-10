@@ -1,8 +1,11 @@
 import os
 import threading
-from enum import Enum
+from enum import IntEnum
 from time import sleep
 from threading import Thread
+from puml_builder import build_uml, visualize_uml
+
+import pprint
 
 # Constant
 SLEEP_TERM = 10
@@ -14,15 +17,14 @@ PARSED_APP_DATA = dict()
 PARSED_APP_DATA_LOCK = threading.Lock()
 
 
-class C(Enum):
-    COMPONENT = 0
-    TYPE = 1
-    TRAITS = 2
-    PHASE = 3
-    HEALTHY = 4
-    STATUS = 5
-    CREATED_TIME = 6
-    CHILD = 7
+class C(IntEnum):
+    COMPONENT = 1
+    TYPE = 2
+    TRAITS = 3
+    PHASE = 4
+    HEALTHY = 5
+    STATUS = 6
+    CREATED_TIME = 7
 
 
 def print_usage():
@@ -50,20 +52,34 @@ def update_app_data():
 
     APP_DATA = app_data
     app_data = APP_DATA.split("\n")
-    parent_component = ""
+    app_name = ""
+
     for i in range(1, len(app_data) - 1):
         # Separate words
         item = app_data[i].split("\t")
         for j in range(len(item)):
             item[j] = item[j].strip()
 
-        # Case: Child component
-        if item[0] == "├─" or item[0] == "└─":
-            PARSED_APP_DATA[parent_component].append(item[1:])
-        # Case: Parent component
-        else:
-            PARSED_APP_DATA[item[0]] = item[1:]
-            parent_component = item[0]
+        # Get an application name
+        if item[0] != "├─" and item[0] != "└─":
+            app_name = item[0]
+
+        if app_name not in PARSED_APP_DATA:
+            PARSED_APP_DATA[app_name] = []
+
+        temp = dict()
+        temp["component"] = item[C.COMPONENT]
+        temp["type"] = item[C.TYPE]
+        temp["traits"] = item[C.TRAITS]
+        temp["phase"] = item[C.PHASE]
+        temp["healthy"] = item[C.HEALTHY]
+        temp["status"] = item[C.STATUS]
+        temp["created_time"] = item[C.CREATED_TIME]
+
+        PARSED_APP_DATA[app_name].append(temp)
+
+    print("Changes in the application have been detected")
+    print(APP_DATA)
 
     PARSED_APP_DATA_LOCK.release()
 
@@ -126,7 +142,12 @@ def visualize_app_data():
         PARSED_APP_DATA_LOCK.release()
         return
 
-    print(PARSED_APP_DATA, "\n")
+    pp = pprint.PrettyPrinter(width=20, indent=4)
+
+    pp.pprint(PARSED_APP_DATA)
+
+    build_uml(app_name, PARSED_APP_DATA[app_name])
+    visualize_uml()
 
     PARSED_APP_DATA_LOCK.release()
 
@@ -144,13 +165,19 @@ def thread1_routine():
 def thread2_routine():
     global USER_INPUT, PARSED_APP_DATA, PARSED_APP_DATA_LOCK
 
+    sleep(1)
+    print_usage()
+
     while True:
         print("> ", end="")
         USER_INPUT = input()
         print()
 
-        if USER_INPUT == "q":
-            print("Terminate the program\n")
+        if USER_INPUT == "":
+            continue
+
+        elif USER_INPUT == "q":
+            print("Terminate the program")
             break
 
         elif USER_INPUT == "p":
@@ -167,8 +194,6 @@ def thread2_routine():
 
 
 if __name__ == "__main__":
-    print_usage()
-
     thread1 = Thread(target=thread1_routine)
     thread2 = Thread(target=thread2_routine)
 

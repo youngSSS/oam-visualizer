@@ -1,44 +1,52 @@
-def header_builder():
-    return "@startuml OAM\n\n"
+import os
+from time import sleep
 
 
-def footer_builder():
+def build_header():
+    return "@startuml visualized_application\n\n"
+
+
+def build_footer():
     return "hide methods\nhide circle\n\n@enduml"
 
 
-def package_builder(name, items):
-    ret_val = "package " + name + " <<Rectangle>> {\n\n"
+def build_component(app_name, data):
+    ret_val = "package " + app_name.title() + " <<Rectangle>> {\n\n"
 
-    if name == "Components":
-        for key, value in items.items():
-            ret_val += "\tclass " + key + " {\n"
-            for component_name in value:
-                ret_val += "\t\t" + component_name + "\n"
-                if component_name != value[-1]:
-                    ret_val += "\t\t--\n"
-            ret_val += "\t}\n\n"
+    for item in data:
+        ret_val += "\tclass " + item["component"].upper() + " {\n"
 
-    else:
-        for item in items:
-            ret_val += "\tclass " + item + "\n"
-        ret_val += "\n"
+        for key in item:
+            if key == "component":
+                continue
+            ret_val += "\t\t" + key.title() + " - " + item[key] + "\n"
+            ret_val += "\t\t--\n"
+
+        ret_val = ret_val[: len(ret_val) - 5]
+        ret_val += "\t}\n\n"
 
     ret_val += "}\n\n"
 
     return ret_val
 
 
-def relation_builder(relation, arrow_flag):
-    ret_val = ""
+def visualize_uml():
+    os.popen("plantuml ./result/uml_data.uml")
+    os.popen("open ./result/visualized_application.png")
+    return
 
-    if arrow_flag:
-        line = "-up[dashed]-> "
-    else:
-        line = " -up[dashed]- "
 
-    for key, value in relation.items():
-        for v in value:
-            ret_val += v + line + key + "\n"
-    ret_val += "\n"
+def build_uml(app_name, data):
+    uml_data = ""
 
-    return ret_val
+    uml_data += build_header()
+    uml_data += build_component(app_name, data)
+    uml_data += build_footer()
+
+    f = open("./result/uml_data.uml", "w")
+    f.write(uml_data)
+    f.close()
+
+    visualize_uml()
+
+    return uml_data
