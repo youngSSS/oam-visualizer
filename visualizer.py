@@ -5,7 +5,7 @@ from time import sleep
 from threading import Thread
 
 # Constant
-SLEEP_TERM = 5
+SLEEP_TERM = 10
 
 # Global variable
 USER_INPUT = ""
@@ -28,7 +28,8 @@ class C(Enum):
 def print_usage():
     print()
     print("--------------------- Usage --------------------")
-    print("> s          - Show application list with app_id")
+    print("> p          - Show entire application")
+    print("> l          - Show application list with app_id")
     print("> v app_name - Visualize application status")
     print("> q          - Terminate the program")
     print("------------------------------------------------")
@@ -64,8 +65,21 @@ def update_app_data():
             PARSED_APP_DATA[item[0]] = item[1:]
             parent_component = item[0]
 
-    print(APP_DATA)
+    PARSED_APP_DATA_LOCK.release()
 
+
+def print_app():
+    global APP_DATA, PARSED_APP_DATA_LOCK
+
+    # Get latest app data
+    update_app_data()
+
+    if APP_DATA == "":
+        print("There is no application running")
+        return
+
+    PARSED_APP_DATA_LOCK.acquire()
+    print(APP_DATA)
     PARSED_APP_DATA_LOCK.release()
 
 
@@ -79,14 +93,14 @@ def print_app_list():
 
     # Case: No application
     if len(PARSED_APP_DATA) == 0:
-        print("\nThere is no application running\n")
+        print("There is no application running\n")
         PARSED_APP_DATA_LOCK.release()
         return
 
     # Print the application list
-    print("\nAPP LIST")
+    print("APP LIST")
     for key in PARSED_APP_DATA:
-        print("> " + key)
+        print(key)
     print()
 
     PARSED_APP_DATA_LOCK.release()
@@ -108,34 +122,13 @@ def visualize_app_data():
     PARSED_APP_DATA_LOCK.acquire()
 
     if app_name not in PARSED_APP_DATA:
-        print("\nApplication", app_name, "is not exist\n")
+        print('Application "', app_name, '" is not exist\n', sep="")
         PARSED_APP_DATA_LOCK.release()
         return
 
-    print(PARSED_APP_DATA)
+    print(PARSED_APP_DATA, "\n")
 
     PARSED_APP_DATA_LOCK.release()
-
-
-# Handle user input
-def thread2_routine():
-    global USER_INPUT, PARSED_APP_DATA, PARSED_APP_DATA_LOCK
-
-    while True:
-        USER_INPUT = input()
-
-        if USER_INPUT == "q":
-            print("Terminate the program")
-            break
-
-        elif USER_INPUT == "s":
-            print_app_list()
-
-        elif USER_INPUT[0] == "v":
-            visualize_app_data()
-
-        else:
-            print("Error, unknown command")
 
 
 # Update the application information every SLEEP_TERM
@@ -145,6 +138,32 @@ def thread1_routine():
     while True:
         update_app_data()
         sleep(SLEEP_TERM)
+
+
+# Handle user input
+def thread2_routine():
+    global USER_INPUT, PARSED_APP_DATA, PARSED_APP_DATA_LOCK
+
+    while True:
+        print("> ", end="")
+        USER_INPUT = input()
+        print()
+
+        if USER_INPUT == "q":
+            print("Terminate the program\n")
+            break
+
+        elif USER_INPUT == "p":
+            print_app()
+
+        elif USER_INPUT == "l":
+            print_app_list()
+
+        elif USER_INPUT[0] == "v":
+            visualize_app_data()
+
+        else:
+            print("Error, unknown command\n")
 
 
 if __name__ == "__main__":
