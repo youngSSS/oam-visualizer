@@ -5,7 +5,7 @@ from time import sleep
 from threading import Thread
 
 # Constant
-SLEEP_TERM = 60
+SLEEP_TERM = 5
 
 # Global variable
 USER_INPUT = ""
@@ -38,16 +38,21 @@ def print_usage():
 def update_app_data():
     global APP_DATA, PARSED_APP_DATA, PARSED_APP_DATA_LOCK
 
+    app_data = os.popen("vela ls").read()
+
+    # Case: No changes
+    if APP_DATA == app_data:
+        return
+
+    # Case: Changes
     PARSED_APP_DATA_LOCK.acquire()
 
-    APP_DATA = os.popen("vela ls").read()
-    data = APP_DATA.split("\n")
-
+    APP_DATA = app_data
+    app_data = APP_DATA.split("\n")
     parent_component = ""
-    for i in range(1, len(data) - 1):
-
+    for i in range(1, len(app_data) - 1):
         # Separate words
-        item = data[i].split("\t")
+        item = app_data[i].split("\t")
         for j in range(len(item)):
             item[j] = item[j].strip()
 
@@ -58,6 +63,8 @@ def update_app_data():
         else:
             PARSED_APP_DATA[item[0]] = item[1:]
             parent_component = item[0]
+
+    print(APP_DATA)
 
     PARSED_APP_DATA_LOCK.release()
 
@@ -100,6 +107,13 @@ def visualize_app_data():
 
     PARSED_APP_DATA_LOCK.acquire()
 
+    if app_name not in PARSED_APP_DATA:
+        print("\nApplication", app_name, "is not exist\n")
+        PARSED_APP_DATA_LOCK.release()
+        return
+
+    print(PARSED_APP_DATA)
+
     PARSED_APP_DATA_LOCK.release()
 
 
@@ -111,6 +125,7 @@ def thread2_routine():
         USER_INPUT = input()
 
         if USER_INPUT == "q":
+            print("Terminate the program")
             break
 
         elif USER_INPUT == "s":
@@ -129,7 +144,6 @@ def thread1_routine():
 
     while True:
         update_app_data()
-        print(APP_DATA)
         sleep(SLEEP_TERM)
 
 
