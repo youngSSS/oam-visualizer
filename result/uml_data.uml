@@ -1,0 +1,24 @@
+@startuml visualized_application
+
+package First-App <<Rectangle>> {
+
+	class HELLOWORLD {
+		Type - webservice
+		--
+		Traits - ingress
+		--
+		Phase - running
+		--
+		Healthy - healthy
+		--
+		Status - 
+		--
+		Created_Time - 2021-11-09 20:33:00 +0900 KST
+	}
+
+}
+
+hide methods
+hide circle
+
+@enduml
