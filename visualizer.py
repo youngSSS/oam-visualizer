@@ -78,6 +78,7 @@ def update_app_data():
 
     print("Changes in the application have been detected")
     print(APP_DATA)
+    print("> ")
 
     PARSED_APP_DATA_LOCK.release()
 
