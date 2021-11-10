@@ -1,8 +1,8 @@
 @startuml visualized_application
 
-package Bikesharing <<Rectangle>> {
+package Service-Tracker <<Rectangle>> {
 
-	class BIKESHARING-UI {
+	class SERVICE-TRACKER-UI {
 		Type - webservice
 		--
 		Traits - ingress
@@ -13,10 +13,52 @@ package Bikesharing <<Rectangle>> {
 		--
 		Status - 
 		--
-		Created_Time - 2021-11-10 14:35:25 +0900 KST
+		Created_Time - 2021-11-10 14:49:09 +0900 KST
 	}
 
-	class BIKESHARING-EMAIL-API {
+	class WEATHER-API {
+		Type - enhanced-webservice
+		--
+		Traits - scaler
+		--
+		Phase - running
+		--
+		Healthy - healthy
+		--
+		Status - 
+		--
+		Created_Time - 2021-11-10 14:49:09 +0900 KST
+	}
+
+	class QUAKES-API {
+		Type - enhanced-webservice
+		--
+		Traits - scaler
+		--
+		Phase - running
+		--
+		Healthy - healthy
+		--
+		Status - 
+		--
+		Created_Time - 2021-11-10 14:49:09 +0900 KST
+	}
+
+	class FLIGHT-API {
+		Type - enhanced-webservice
+		--
+		Traits - scaler
+		--
+		Phase - running
+		--
+		Healthy - healthy
+		--
+		Status - 
+		--
+		Created_Time - 2021-11-10 14:49:09 +0900 KST
+	}
+
+	class TRACKER-POSTGRES-DB {
 		Type - enhanced-webservice
 		--
 		Traits - 
@@ -27,10 +69,10 @@ package Bikesharing <<Rectangle>> {
 		--
 		Status - 
 		--
-		Created_Time - 2021-11-10 14:35:25 +0900 KST
+		Created_Time - 2021-11-10 14:49:09 +0900 KST
 	}
 
-	class BIKESHARING-PROFILE-API {
+	class DATA-API {
 		Type - enhanced-webservice
 		--
 		Traits - 
@@ -41,21 +83,7 @@ package Bikesharing <<Rectangle>> {
 		--
 		Status - 
 		--
-		Created_Time - 2021-11-10 14:35:25 +0900 KST
-	}
-
-	class BIKESHARING-FEEDBACK-API {
-		Type - enhanced-webservice
-		--
-		Traits - 
-		--
-		Phase - running
-		--
-		Healthy - healthy
-		--
-		Status - 
-		--
-		Created_Time - 2021-11-10 14:35:25 +0900 KST
+		Created_Time - 2021-11-10 14:49:09 +0900 KST
 	}
 
 }
