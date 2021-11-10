@@ -9,6 +9,7 @@ SLEEP_TERM = 60
 
 # Global variable
 USER_INPUT = ""
+APP_DATA = ""
 PARSED_APP_DATA = dict()
 PARSED_APP_DATA_LOCK = threading.Lock()
 
@@ -26,17 +27,21 @@ class C(Enum):
 
 def print_usage():
     print()
-    print("------------------ How To Use ------------------\n")
-    print(">> s          - Show application list with app_id")
-    print(">> v app_name - Visualize application status")
-    print(">> q          - Terminate the program")
+    print("--------------------- Usage --------------------")
+    print("> s          - Show application list with app_id")
+    print("> v app_name - Visualize application status")
+    print("> q          - Terminate the program")
+    print("------------------------------------------------")
     print()
 
 
 def update_app_data():
+    global APP_DATA, PARSED_APP_DATA, PARSED_APP_DATA_LOCK
+
     PARSED_APP_DATA_LOCK.acquire()
 
-    data = os.popen("vela ls").read().split("\n")
+    APP_DATA = os.popen("vela ls").read()
+    data = APP_DATA.split("\n")
 
     parent_component = ""
     for i in range(1, len(data) - 1):
@@ -54,35 +59,43 @@ def update_app_data():
             PARSED_APP_DATA[item[0]] = item[1:]
             parent_component = item[0]
 
-    print(PARSED_APP_DATA)
-
     PARSED_APP_DATA_LOCK.release()
 
 
 def print_app_list():
     global PARSED_APP_DATA, PARSED_APP_DATA_LOCK
-    print("print_app_list")
 
+    # Get latest app data
     update_app_data()
 
     PARSED_APP_DATA_LOCK.acquire()
 
+    # Case: No application
+    if len(PARSED_APP_DATA) == 0:
+        print("\nThere is no application running\n")
+        PARSED_APP_DATA_LOCK.release()
+        return
+
+    # Print the application list
+    print("\nAPP LIST")
     for key in PARSED_APP_DATA:
-        print(key)
+        print("> " + key)
+    print()
 
     PARSED_APP_DATA_LOCK.release()
 
 
-def visualize_app_data(user_input):
-    global PARSED_APP_DATA, PARSED_APP_DATA_LOCK
+def visualize_app_data():
+    global USER_INPUT, PARSED_APP_DATA, PARSED_APP_DATA_LOCK
 
-    app_name = user_input[2:]
+    app_name = USER_INPUT[2:]
 
-    if app_name == "" or user_input[1] != " ":
+    if app_name == "" or USER_INPUT[1] != " ":
         print("Command format error, please follow below usage")
         print_usage()
         return
 
+    # Get latest app data
     update_app_data()
 
     PARSED_APP_DATA_LOCK.acquire()
@@ -104,7 +117,7 @@ def thread2_routine():
             print_app_list()
 
         elif USER_INPUT[0] == "v":
-            visualize_app_data(USER_INPUT)
+            visualize_app_data()
 
         else:
             print("Error, unknown command")
@@ -112,8 +125,11 @@ def thread2_routine():
 
 # Update the application information every SLEEP_TERM
 def thread1_routine():
+    global APP_DATA
+
     while True:
         update_app_data()
+        print(APP_DATA)
         sleep(SLEEP_TERM)
 
 
