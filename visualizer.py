@@ -5,10 +5,8 @@ from time import sleep
 from threading import Thread
 from puml_builder import build_uml, visualize_uml
 
-import pprint
-
 # Constant
-SLEEP_TERM = 10
+SLEEP_TERM = 5
 
 # Global variable
 USER_INPUT = ""
@@ -141,10 +139,6 @@ def visualize_app_data():
         print('Application "', app_name, '" is not exist\n', sep="")
         PARSED_APP_DATA_LOCK.release()
         return
-
-    pp = pprint.PrettyPrinter(width=20, indent=4)
-
-    pp.pprint(PARSED_APP_DATA)
 
     build_uml(app_name, PARSED_APP_DATA[app_name])
     visualize_uml()
