@@ -6,7 +6,7 @@ from threading import Thread
 from puml_builder import build_uml, visualize_uml
 
 # Constant
-SLEEP_TERM = 5
+SLEEP_TERM = 1
 
 # Global variable
 USER_INPUT = ""
