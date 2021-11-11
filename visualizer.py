@@ -29,7 +29,7 @@ def print_usage():
     print()
     print("--------------------- Usage --------------------")
     print("> p          - Show entire application")
-    print("> l          - Show application list with app_id")
+    print("> l          - Show application list with app_name")
     print("> v app_name - Visualize application status")
     print("> q          - Terminate the program")
     print("------------------------------------------------")
